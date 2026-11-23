@@ -1,0 +1,14 @@
+# Serviço de usuário (Linux). Copie para ~/.config/systemd/user/kaizen-os.service e ajuste o caminho do app.
+# Depois: systemctl --user daemon-reload && systemctl --user enable --now kaizen-os && loginctl enable-linger $USER
+[Unit]
+Description=Kaizen OS (habitos e saude)
+After=network.target
+
+[Service]
+EnvironmentFile=%h/.config/kaizen-os/env
+WorkingDirectory=%h/kaizen-os/app
+ExecStart=/usr/bin/python3 app.py serve --host 127.0.0.1 --port 8787
+Restart=always
+
+[Install]
+WantedBy=default.target

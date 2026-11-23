@@ -1,0 +1,9 @@
+# dados pessoais nunca vão para o git
+*.db
+*.db-*
+.env
+env
+app/seed.json
+payloads/
+__pycache__/
+*.pyc

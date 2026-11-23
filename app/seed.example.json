@@ -1,0 +1,18 @@
+{
+  "nome": "Kaizen OS",
+  "relogio": "Relógio",
+  "limite_ativos": 5,
+  "habitos": [
+    {"id": "celular", "nome": "Celular fora do quarto", "detalhe": "carrega na sala", "icone": "celular", "xp": 15},
+    {"id": "acordar", "nome": "Acordar no horário", "detalhe": "despertador fora da cama", "icone": "acordou7", "xp": 10},
+    {"id": "movimento", "nome": "Mexer o corpo", "detalhe": "20 minutos já contam", "icone": "academia", "xp": 20},
+    {"id": "foco", "nome": "Bloco de foco", "detalhe": "60 min, celular longe", "icone": "foco", "xp": 20}
+  ],
+  "fase": {"nome": "Fase 1 · só as âncoras", "inicio": "AAAA-MM-DD", "dias": 14},
+  "marcos": [{"data": "AAAA-MM-DD", "texto": "revisão da fase 1"}],
+  "combinados": [
+    "Poucos hábitos, todo dia. Um pouco já conta.",
+    "O celular dorme fora do quarto.",
+    "Recaída é dado, não sentença."
+  ]
+}

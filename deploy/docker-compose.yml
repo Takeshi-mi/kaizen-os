@@ -1,0 +1,13 @@
+# Rode na pasta raiz do kit: docker compose -f deploy/docker-compose.yml up -d --build
+# Crie antes o arquivo .env na raiz do kit com ANCORAS_TOKEN=... (e opcionalmente ANCORAS_HOOK_TOKEN, ANCORAS_PUBLIC_URL).
+services:
+  kaizen-os:
+    build: { context: .., dockerfile: deploy/Dockerfile }
+    env_file: ../.env
+    environment:
+      ANCORAS_SEED: /app/seed.json
+    ports: ["127.0.0.1:8787:8787"]   # só local; o acesso externo é pelo Tailscale
+    volumes: ["kaizen-dados:/data"]
+    restart: unless-stopped
+volumes:
+  kaizen-dados:
