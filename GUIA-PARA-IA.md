@@ -12,7 +12,7 @@
 3. **Comandos prontos para colar.** Sempre para o sistema operacional e o shell da pessoa (PowerShell ≠ bash ≠ zsh). Explique em uma linha o que cada comando faz.
 4. **Segredos.** O token de acesso nunca deve ser colado na conversa, em grupos ou em prints. Gere no computador da pessoa e peça para ela confirmar só que funcionou. Se vazar, gere outro.
 5. **Verifique antes de avançar.** Cada etapa tem um teste ("Como saber que deu certo"). Não pule.
-6. **Pouco é mais.** O app foi desenhado para **no máximo 5 hábitos ativos**, pequenos e concretos. Se a pessoa quiser 12 hábitos, explique que ela vai parar de preencher; ajude a escolher 3 a 5 e deixar o resto para depois (o app tem "graduar" para abrir espaço).
+6. **Pouco costuma funcionar melhor.** Não há limite fixo de hábitos: a pessoa decide. Vale comentar que listas enxutas (3 a 5) são mais fáceis de manter e que o app tem "graduar" para abrir espaço; se ela quiser se travar num número, use `config limite N`. A decisão é dela.
 7. **Tom.** Simples, encorajador, sem jargão. Recaída é dado, não sentença: isso vale para o app e para a instalação.
 
 ## O que é o Kaizen OS
@@ -31,7 +31,7 @@ Um PWA (site que se instala como app no celular) com:
 ### Modelo dos hábitos (por que não vira um checklist infinito)
 
 - Cada hábito tem início, status (`ativo`, `consolidado`, `pausado`, `arquivado`) e fim.
-- **Limite de ativos** (padrão 5). Para começar um novo, outro precisa **graduar** (virou automático: o app sugere quando chega a 85% em 21 dias) ou **pausar**.
+- **Limite de ativos opcional** (padrão: sem limite; `config limite 5` trava em 5). Hábitos que viram automáticos (o app sugere a partir de 85% em 21 dias) se **graduam**; dá também para **pausar**.
 - Graduados saem do check-in diário mas ficam no histórico e viram conquista 🎓.
 - **Fases** são blocos de tempo (ex.: "Fase 1 · só as âncoras", 14 dias). Ao fim de uma fase, a pessoa revê: gradua o que está automático e escolhe no máximo 1 ou 2 mini-hábitos novos.
 
@@ -148,7 +148,17 @@ Funciona com qualquer app que escreva no **Health Connect** (Mi Fitness, Samsung
 
 - Marcar os hábitos de hoje na tela Hoje e ouvir o primeiro som 🙂.
 - Combinar com a pessoa um horário fixo para o check-in (ex.: 20h) e, se ela usa um agente de IA no mesmo computador, ele pode registrar pelo chat com a CLI (abaixo).
-- No fim da fase (14 dias): ver no Dojo quais hábitos estão em 85%+ e graduar; escolher no máximo 1 ou 2 mini-hábitos novos.
+- No fim da fase (14 dias): ver no Dojo quais hábitos estão em 85%+ e graduar; escolher os próximos mini-hábitos (adicionar poucos por vez costuma funcionar melhor).
+
+### Etapa 7 (recomendada) — Conectar ao agente pessoal
+
+O Kaizen OS foi feito para ser usado junto com um agente pessoal (Hermes Agent, Claude Code, OpenClaw, Codex…) rodando no mesmo computador.
+
+1. Entregue o **`AGENTE.md`** ao agente como skill/instrução permanente.
+2. Crie o atalho `kaizen` descrito no `AGENTE.md`.
+3. Combine com a pessoa um check-in agendado (ex.: 20h, pelo Telegram/WhatsApp do agente) que pergunta só o que falta, e uma revisão semanal.
+
+**Como saber que deu certo:** a pessoa manda "fiz meu treino" para o agente e o item aparece marcado no app em até 1 minuto.
 
 ## Referência rápida da CLI
 
@@ -175,7 +185,7 @@ python3 app/app.py export registro.csv                          # backup legíve
 | `tailscale serve` dá "Access denied" | Precisa de root | Usar `sudo`, ou `sudo tailscale set --operator=$USER` uma vez |
 | Erro de certificado no Tailscale | HTTPS Certificates desligado | Ligar no painel admin → DNS |
 | Sono não aparece | App do fabricante não sincronizou | Abrir o app do relógio de manhã; conferir permissões do Health Connect e otimização de bateria |
-| "limite de 5 hábitos ativos" | Proteção contra excesso | Graduar ou pausar um hábito antes |
+| "limite de N hábitos ativos" | A pessoa ligou um limite (`config limite N`) | Graduar/pausar um hábito, ou `config limite 0` para tirar o limite |
 | Mudei o `seed.json` e nada mudou | Seed só vale com banco vazio | Use o Dojo/CLI, ou apague o banco (perde histórico) |
 
 ## Privacidade

@@ -130,7 +130,7 @@ def ingerir(con, payload, gravar_checkin):
     for dia in sorted(dias_sono):
         s = sono_principal(con, dia)
         if s:
-            gravar_checkin(con, dia, {"dormiu": s["inicio"][11:16], "sono_h": round(s["dormindo_s"] / 3600, 1)}, "miband")
+            gravar_checkin(con, dia, {"dormiu": s["inicio"][11:16], "sono_h": round(s["dormindo_s"] / 3600, 1)}, "relogio")
     return {"ok": True, "registros": contagem, "dias_sono": sorted(dias_sono)}
 
 

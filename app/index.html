@@ -313,7 +313,7 @@ details[open] summary::after{content:"–"}
     </section>
     <section class="card">
       <div class="row"><h2>Hábitos da fase</h2><span class="muted small" id="hb-lim"></span></div>
-      <p class="muted small" style="margin:2px 0 0">Poucos de cada vez. Quando um hábito fica no automático (85% em 21 dias), ele se gradua e abre espaço para o próximo mini-hábito.</p>
+      <p class="muted small" style="margin:2px 0 0">Quando um hábito fica no automático (85% em 21 dias), ele se gradua: sai do check-in diário e abre espaço para o próximo. Quanto mais enxuta a lista, mais fácil manter.</p>
       <ul class="workouts" id="hb-ativos"></ul>
       <div id="hb-cons"></div>
       <details style="margin-top:10px" id="hb-novo-box">
@@ -395,7 +395,7 @@ details[open] summary::after{content:"–"}
     hab:`<svg ${S}><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>`
   };
   // hábitos vêm do servidor (/api/habitos); cada dia mostra só os que estavam ativos nele
-  let EST={nome:"Kaizen OS",habitos:[],fases:[],marcos:[],limite_ativos:5,relogio:"Relógio"};
+  let EST={nome:"Kaizen OS",habitos:[],fases:[],marcos:[],limite_ativos:0,relogio:"Relógio"};
   const ativoEm=(h,d)=>h.inicio<=d&&(!h.fim||d<=h.fim)&&h.status!=="arquivado";
   const ancorasDe=d=>EST.habitos.filter(h=>ativoEm(h,d)).map(h=>({k:h.id,t:h.nome,d:h.detalhe||"",ic:h.icone,xp:h.xp}));
   const icone=ic=>ICONS[ic]||`<span style="font-size:20px;line-height:1">${esc(ic||"✓")}</span>`;
@@ -779,7 +779,7 @@ details[open] summary::after{content:"–"}
   }
   function renderGestao(){
     const at=EST.habitos.filter(h=>h.status==="ativo"), lim=EST.limite_ativos;
-    $("hb-lim").textContent=at.length+" de "+lim+" ativos";
+    $("hb-lim").textContent=lim?at.length+" de "+lim+" ativos":at.length+" ativos";
     const ul=$("hb-ativos"); ul.textContent="";
     at.forEach(h=>{
       const pct=h.marcados21?Math.round(h.cumpridos21/h.marcados21*100):null;
@@ -796,7 +796,7 @@ details[open] summary::after{content:"–"}
     const outros=EST.habitos.filter(h=>h.status!=="ativo");
     $("hb-cons").innerHTML=outros.length?`<h3 style="margin-top:12px">Graduados e pausados</h3><ul class="workouts">${outros.map(h=>`<li><span class="when">${h.status==="consolidado"?"🎓":"⏸"}</span><span>${esc(h.nome)}<br><small class="muted">${h.status==="consolidado"?"graduado em "+dmy(h.fim):"pausado"}</small></span><button type="button" class="navbtn" data-re="${esc(h.id)}" style="height:34px;font-size:13px;padding:0 10px">Reativar</button></li>`).join("")}</ul>`:"";
     $("hb-cons").querySelectorAll("[data-re]").forEach(b=>b.onclick=()=>mudarHabito(EST.habitos.find(h=>h.id===b.dataset.re),"reativar"));
-    const cheio=at.length>=lim;
+    const cheio=!!lim&&at.length>=lim;
     $("hb-criar").disabled=cheio; $("hb-criar").textContent=cheio?"Limite de "+lim+" ativos: gradue ou pause um antes":"Começar hoje";
   }
   async function mudarHabito(h,acao){

@@ -1,7 +1,7 @@
 {
   "nome": "Kaizen OS",
   "relogio": "Relógio",
-  "limite_ativos": 5,
+  "limite_ativos": 0,
   "habitos": [
     {"id": "celular", "nome": "Celular fora do quarto", "detalhe": "carrega na sala", "icone": "celular", "xp": 15},
     {"id": "acordar", "nome": "Acordar no horário", "detalhe": "despertador fora da cama", "icone": "acordou7", "xp": 10},

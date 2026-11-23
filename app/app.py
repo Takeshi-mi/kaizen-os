@@ -3,8 +3,8 @@
 
 Modelo que evolui sem acumular checklist:
   - `habitos`: cada mini-hábito tem início, status (ativo, consolidado, pausado, arquivado) e fim.
-    Há um limite de hábitos ATIVOS (padrão 5). Para entrar um novo, outro precisa se consolidar
-    (graduar) ou pausar. O histórico de todos fica guardado.
+    Limite de hábitos ATIVOS opcional (padrão: sem limite; `config limite 5` para travar em 5).
+    Hábitos que viram automáticos se graduam e saem do check-in diário. O histórico fica guardado.
   - `marcas`: uma linha por dia × hábito (sim/não).
   - `checkins`: o resto do dia (sono, tela, energia, ansiedade, nota).
   - `fases`: blocos de tempo (ex.: "Fase 1 · só as âncoras", 14 dias).
@@ -20,7 +20,7 @@ Linha de comando (para você ou para um agente de IA no mesmo servidor):
   app.py habito novo agua "Beber 2 L de água" "garrafa na mesa" agua 10
   app.py habito graduar celular | pausar ID | reativar ID | arquivar ID
   app.py fase nova "Fase 2 · água" 2026-12-07 2026-12-20
-  app.py config nome "Kaizen da Ana" | config limite 5
+  app.py config nome "Kaizen da Ana" | config limite 5   # 0 = sem limite
 
 Banco: ancoras.db na mesma pasta (ou ANCORAS_DB=/caminho/ancoras.db).
 Primeira execução: se existir ANCORAS_SEED (JSON) ou seed.json na pasta, ele define nome, hábitos e fase.
@@ -58,7 +58,7 @@ SIM, NAO = {"sim", "s", "1", "true", "yes"}, {"nao", "não", "n", "0", "false", 
 
 PADRAO = {
     "nome": "Kaizen OS",
-    "limite_ativos": 5,
+    "limite_ativos": 0,
     "marcos": [],
     "habitos": [
         {"id": "celular", "nome": "Celular fora do quarto", "detalhe": "e fora do banheiro", "icone": "celular", "xp": 15},
@@ -144,7 +144,7 @@ def _semear(con):
         fim = f.get("fim") or (datetime.fromisoformat(inicio_fase) + timedelta(days=int(f.get("dias", 14)) - 1)).date().isoformat()
         con.execute("INSERT INTO fases(nome,inicio,fim) VALUES (?,?,?)", (f.get("nome", "Fase 1"), inicio_fase, fim))
     _set_cfg(con, "nome", seed.get("nome", "Âncoras"))
-    _set_cfg(con, "limite_ativos", int(seed.get("limite_ativos", 5)))
+    _set_cfg(con, "limite_ativos", int(seed.get("limite_ativos", 0)))
     _set_cfg(con, "marcos", seed.get("marcos", []))
     _set_cfg(con, "relogio", seed.get("relogio", "Relógio"))
     _set_cfg(con, "combinados", seed.get("combinados", []))
@@ -312,9 +312,9 @@ def habito_novo(con, hid, nome, detalhe="", icone="check", xp=10, inicio=None):
         raise ValueError("id: minúsculas, números e _, 2 a 24 caracteres, sem nomes reservados")
     if con.execute("SELECT 1 FROM habitos WHERE id=?", (hid,)).fetchone():
         raise ValueError(f"já existe um hábito '{hid}' (use reativar)")
-    limite = _cfg(con, "limite_ativos", 5)
+    limite = _cfg(con, "limite_ativos", 0)
     ativos = con.execute("SELECT COUNT(*) FROM habitos WHERE status='ativo'").fetchone()[0]
-    if ativos >= limite:
+    if limite and ativos >= limite:
         raise ValueError(f"limite de {limite} hábitos ativos. Gradue (consolidado) ou pause um antes de começar outro.")
     if not str(nome).strip():
         raise ValueError("nome obrigatório")
@@ -343,9 +343,9 @@ def habito_status(con, hid, acao, quando=None):
     elif acao == "arquivar":
         con.execute("UPDATE habitos SET status='arquivado', fim=COALESCE(fim, ?) WHERE id=?", (dia, hid))
     elif acao == "reativar":
-        limite = _cfg(con, "limite_ativos", 5)
+        limite = _cfg(con, "limite_ativos", 0)
         ativos = con.execute("SELECT COUNT(*) FROM habitos WHERE status='ativo'").fetchone()[0]
-        if h["status"] != "ativo" and ativos >= limite:
+        if limite and h["status"] != "ativo" and ativos >= limite:
             raise ValueError(f"limite de {limite} hábitos ativos")
         con.execute("UPDATE habitos SET status='ativo', fim=NULL WHERE id=?", (hid,))
     else:
@@ -381,7 +381,7 @@ def estrutura(con):
         h["cumpridos21"], h["marcados21"] = s, n
     return {
         "nome": _cfg(con, "nome", "Kaizen OS"),
-        "limite_ativos": _cfg(con, "limite_ativos", 5),
+        "limite_ativos": _cfg(con, "limite_ativos", 0),
         "marcos": _cfg(con, "marcos", []),
         "relogio": _cfg(con, "relogio", "Relógio"),
         "combinados": _cfg(con, "combinados", []),
@@ -589,7 +589,7 @@ def main(argv):
             print(f"{n} dia(s) importados")
         elif cmd == "habitos":
             e = estrutura(con)
-            print(f"{e['nome']} · limite de {e['limite_ativos']} ativos")
+            print(f"{e['nome']} · " + (f"limite de {e['limite_ativos']} ativos" if e["limite_ativos"] else "sem limite de ativos"))
             for h in e["habitos"]:
                 pct = f"{round(h['cumpridos21'] / h['marcados21'] * 100)}%" if h["marcados21"] else "–"
                 fim = f" até {h['fim']}" if h["fim"] else ""
